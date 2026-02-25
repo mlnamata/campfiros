@@ -22,7 +22,7 @@ export default function Home() {
             </svg>
           </div>
           <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
-            Check-in Registrace
+            Check-in CampFire
           </h1>
           <p className="text-gray-500 mt-3 text-sm sm:text-base px-2">
             Prosím o vyplnění dodatečných informací pro hladký průběh události.

@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Check-in Registrace | Událost",
+  title: "Check-in CampFire",
   description: "Registrační formulář pro účastníky události k upřesnění stravovacích požadavků a alergií.",
 };
 

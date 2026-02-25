@@ -6,10 +6,11 @@ import { Loader2, CheckCircle } from "lucide-react";
 
 export function CheckinForm() {
     const [state, action, isPending] = useActionState<ActionState, FormData>(
-        submitCheckin as any,
+        submitCheckin,
         { success: false }
     );
 
+    const [selectedDiets, setSelectedDiets] = useState<string[]>([]);
     const [email, setEmail] = useState("");
     const [clientError, setClientError] = useState("");
 
@@ -28,6 +29,14 @@ export function CheckinForm() {
             setClientError("Neplatný formát e-mailu.");
             return;
         }
+    };
+
+    const handleDietChange = (diet: string) => {
+        setSelectedDiets(prev =>
+            prev.includes(diet)
+                ? prev.filter(d => d !== diet)
+                : [...prev, diet]
+        );
     };
 
     if (state.success) {
@@ -81,13 +90,16 @@ export function CheckinForm() {
                         "Vegetariánská",
                         "Veganská",
                         "Bezlepková",
-                        "Bez laktózy"
+                        "Bez laktózy",
+                        "Jiné"
                     ].map((diet) => (
                         <label key={diet} className="flex items-center p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors group">
                             <input
                                 type="checkbox"
                                 name="dietary_needs"
                                 value={diet}
+                                checked={selectedDiets.includes(diet)}
+                                onChange={() => handleDietChange(diet)}
                                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                             />
                             <span className="ml-3 text-sm text-gray-700 group-hover:text-gray-900">{diet}</span>
@@ -95,6 +107,22 @@ export function CheckinForm() {
                     ))}
                 </div>
             </div>
+
+            {selectedDiets.includes("Jiné") && (
+                <div className="space-y-2 animate-in slide-in-from-top-2 duration-300">
+                    <label htmlFor="dietary_needs_other" className="block text-sm font-semibold text-gray-700">
+                        Upřesněte jiné stravovací požadavky <span className="text-red-500">*</span>
+                    </label>
+                    <textarea
+                        id="dietary_needs_other"
+                        name="dietary_needs_other"
+                        rows={2}
+                        required
+                        placeholder="Např. alergie na ořechy, keto, atd."
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none bg-gray-50/50 hover:bg-gray-50 resize-y"
+                    ></textarea>
+                </div>
+            )}
 
             <div className="space-y-2">
                 <label htmlFor="allergies" className="block text-sm font-semibold text-gray-700">

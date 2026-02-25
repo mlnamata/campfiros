@@ -1,6 +1,6 @@
 "use server";
 
-import { sql } from "@vercel/postgres";
+import { createClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
 
 export type ActionState = {
@@ -12,13 +12,22 @@ export type ActionState = {
   };
 };
 
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
 export async function submitCheckin(
   prevState: ActionState | undefined,
   formData: FormData
 ): Promise<ActionState> {
   const email = formData.get("email")?.toString().trim() || "";
   const dietaryNeedsValues = formData.getAll("dietary_needs");
-  const dietaryNeeds = dietaryNeedsValues.filter((v): v is string => typeof v === 'string').join(", ");
+  const dietaryNeedsOther = formData.get("dietary_needs_other")?.toString().trim() || "";
+
+  const dietaryNeeds = dietaryNeedsValues
+    .filter((v): v is string => typeof v === 'string')
+    .map(v => v === "Jiné" && dietaryNeedsOther ? `Jiné (${dietaryNeedsOther})` : v)
+    .join(", ");
+
   const allergies = formData.get("allergies")?.toString().trim() || "";
 
   // Validation
@@ -34,34 +43,42 @@ export async function submitCheckin(
   }
 
   try {
-    // If not connected to Vercel Postgres, standard environment variables will be missing.
-    if (!process.env.POSTGRES_URL) {
-      console.warn("POSTGRES_URL is not defined. Skipping database insertion. Data received:", { email, dietaryNeeds, allergies });
-      return { 
-        success: true, 
-        message: "Data byla úspěšně přijata. (Varování: Databáze není připojena)" 
+    // Check for Supabase environment variables
+    if (!supabaseUrl || !supabaseServiceKey || supabaseUrl === "your_supabase_project_url") {
+      console.warn("Supabase credentials are not defined or are placeholders. Skipping database insertion. Data received:", { email, dietaryNeeds, allergies });
+      return {
+        success: true,
+        message: "Data byla úspěšně přijata. (Varování: Databáze není připojena)"
       };
     }
 
-    // Upsert check-in data
-    await sql`
-      INSERT INTO checkins (email, dietary_needs, allergies)
-      VALUES (${email}, ${dietaryNeeds}, ${allergies})
-      ON CONFLICT (email)
-      DO UPDATE SET
-        dietary_needs = EXCLUDED.dietary_needs,
-        allergies = EXCLUDED.allergies,
-        created_at = CURRENT_TIMESTAMP;
-    `;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Upsert check-in data in Supabase
+    const { error } = await supabase
+      .from("checkins")
+      .upsert(
+        {
+          email,
+          dietary_needs: dietaryNeeds,
+          allergies,
+          created_at: new Date().toISOString()
+        },
+        { onConflict: "email" }
+      );
+
+    if (error) {
+      throw error;
+    }
 
     revalidatePath("/");
-    
+
     return {
       success: true,
       message: "Váš check-in byl úspěšný, děkujeme!"
     };
-  } catch (error: any) {
-    console.error("Database connection or query error:", error);
+  } catch (error: unknown) {
+    console.error("Supabase connection or query error:", error);
     return {
       success: false,
       message: "Nepodařilo se uložit data do databáze. Zkuste to prosím později."

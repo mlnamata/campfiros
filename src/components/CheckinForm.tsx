@@ -73,7 +73,7 @@ export function CheckinForm() {
                     value={email}
                     onChange={handleEmailChange}
                     placeholder="např. jan.novak@email.cz"
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none bg-gray-50/50 hover:bg-gray-50"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none bg-gray-50/50 hover:bg-gray-50 text-gray-900"
                 />
                 {(clientError || state.errors?.email) && (
                     <p className="text-red-500 text-sm mt-1">{clientError || state.errors?.email}</p>
@@ -119,7 +119,7 @@ export function CheckinForm() {
                         rows={2}
                         required
                         placeholder="Např. alergie na ořechy, keto, atd."
-                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none bg-gray-50/50 hover:bg-gray-50 resize-y"
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none bg-gray-50/50 hover:bg-gray-50 resize-y text-gray-900"
                     ></textarea>
                 </div>
             )}
@@ -133,7 +133,7 @@ export function CheckinForm() {
                     name="allergies"
                     rows={3}
                     placeholder="Vypište jakékoliv alergie na potraviny. Pokud žádné nemáte, ponechte prázdné."
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none bg-gray-50/50 hover:bg-gray-50 resize-y"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none bg-gray-50/50 hover:bg-gray-50 resize-y text-gray-900"
                 ></textarea>
             </div>
 

@@ -48,7 +48,7 @@ export async function submitCheckin(
       console.warn("Supabase credentials are not defined or are placeholders. Skipping database insertion. Data received:", { email, dietaryNeeds, allergies });
       return {
         success: true,
-        message: "Data byla úspěšně přijata. (Varování: Databáze není připojena)"
+        message: "Data byla úspěšně přijata. "
       };
     }
 
